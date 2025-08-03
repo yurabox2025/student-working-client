@@ -10,7 +10,7 @@ function App() {
     e.preventDefault();
     setMessage('');
     try {
-      const res = await fetch('https://yurabox2025-student-working-server.onrender.com/submit', {
+      const res = await fetch('https://student-working-server.onrender.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date, number, text })
