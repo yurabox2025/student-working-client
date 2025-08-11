@@ -1,78 +1,43 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './auth';
+import Header from './Header';
+import Home from './pages/Home';
+import Admin from './pages/Admin';
+import Login from './pages/Login';
 
-function App() {
-  const [date, setDate] = useState('');
-  const [number, setNumber] = useState('');
-  const [text, setText] = useState('');
-  const [message, setMessage] = useState('');
+function ProtectedRoute({ children }) {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+}
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage('');
-    try {
-      const res = await fetch('https://student-working-server.onrender.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date, number, text })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setMessage(data.message);
-      } else {
-        setMessage(data.error);
-      }
-    } catch (err) {
-      setMessage('Ошибка при отправке');
-    }
-  };
-
+function AppShell() {
   return (
-    <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
-      <div className="card shadow" style={{ maxWidth: 420, width: "100%" }}>
-        <div className="card-body">
-          <h4 className="card-title mb-4 text-center">Форма ввода</h4>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label className="form-label">Дата:</label>
-              <input
-                className="form-control"
-                type="date"
-                value={date}
-                onChange={e => setDate(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Число:</label>
-              <input
-                className="form-control"
-                type="number"
-                value={number}
-                onChange={e => setNumber(e.target.value.replace(/\D/, ''))}
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Текст:</label>
-              <textarea
-                className="form-control"
-                value={text}
-                onChange={e => setText(e.target.value)}
-                required
-                rows={4}
-              />
-            </div>
-            <button type="submit" className="btn btn-primary w-100">Отправить</button>
-          </form>
-          {message && (
-            <div className="alert alert-info mt-4 mb-0 text-center" role="alert">
-              {message}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    <>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <Admin />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppShell />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
