@@ -53,24 +53,36 @@ function Admin() {
 
   return (
     <div className="container py-4">
-      <div className="d-flex align-items-center justify-content-between mb-3">
-        <h3 className="mb-0">Администрирование</h3>
-        <div className="d-flex gap-2">
+      <div className="row mb-3 align-items-center">
+        {/* ЛЕВО: заголовок + счётчик (только на мобиле) */}
+        <div className="col-12 col-md-6 mb-2 mb-md-0">
+          <h3 className="mb-1">Администрирование</h3>
+          <span className="text-muted small d-inline d-md-none">
+            Всего: {rows.length}
+          </span>
+        </div>
+
+        {/* ПРАВО: кнопки + счётчик (на десктопе) */}
+        <div className="col-12 col-md-6 d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-md-end gap-2">
           <button
-            className="btn btn-outline-secondary btn-sm"
+            className="btn btn-outline-secondary btn-sm w-100 w-md-auto"
             onClick={loadData}
             disabled={loading}
           >
             Обновить
           </button>
           <button
-            className="btn btn-outline-danger btn-sm"
+            className="btn btn-outline-danger btn-sm w-100 w-md-auto"
             onClick={clearDb}
             disabled={clearing || loading}
           >
             {clearing ? "Очищаю…" : "Очистить базу"}
           </button>
-          <span className="text-muted small">Всего: {rows.length}</span>
+
+          {/* счётчик справа только на md+ */}
+          <span className="text-muted small d-none d-md-inline ms-md-2 text-nowrap">
+            Всего: {rows.length}
+          </span>
         </div>
       </div>
 
@@ -98,36 +110,41 @@ function Admin() {
                   </td>
                 </tr>
               ) : (
-                rows.map((r) => (
-                  <tr key={r.id ?? `${r.date}-${r.number}-${r.text}`}>
-                    <td>{r.id ?? "—"}</td>
-                    <td>
-                      {r.submitted_at
-                        ? new Date(r.submitted_at).toLocaleString()
-                        : "—"}
-                    </td>
-                    <td>
-                      {r.submitted_at
-                        ? new Date(r.submitted_at).toLocaleDateString("ru-RU", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                          })
-                        : "—"}
-                    </td>
-                    <td>{r.number}</td>
-                    <td
-                      style={{
-                        maxWidth: 420,
-                        whiteSpace: "pre-wrap",
-                        wordBreak: "break-word",
-                      }}
-                    >
-                      {r.text}
-                    </td>
-                    <td>{r.ip || "—"}</td>
-                  </tr>
-                ))
+                rows
+                  .sort((a, b) => a.id - b.id)
+                  .map((r) => (
+                    <tr key={r.id ?? `${r.date}-${r.number}-${r.text}`}>
+                      <td>{r.id ?? "—"}</td>
+                      <td>
+                        {r.submitted_at
+                          ? new Date(r.submitted_at).toLocaleString()
+                          : "—"}
+                      </td>
+                      <td>
+                        {r.submitted_at
+                          ? new Date(r.submitted_at).toLocaleDateString(
+                              "ru-RU",
+                              {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                              }
+                            )
+                          : "—"}
+                      </td>
+                      <td>{r.number}</td>
+                      <td
+                        style={{
+                          maxWidth: 420,
+                          whiteSpace: "pre-wrap",
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        {r.text}
+                      </td>
+                      <td>{r.ip || "—"}</td>
+                    </tr>
+                  ))
               )}
             </tbody>
           </table>

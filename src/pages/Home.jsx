@@ -5,9 +5,11 @@ function Home() {
   const [number, setNumber] = useState("");
   const [text, setText] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setMessage("");
     try {
       const res = await fetch(
@@ -22,6 +24,8 @@ function Home() {
       setMessage(res.ok ? data.message : data.error);
     } catch {
       setMessage("Ошибка при отправке");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,8 +68,12 @@ function Home() {
                 rows={4}
               />
             </div>
-            <button type="submit" className="btn btn-primary w-100">
-              Отправить
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              disabled={loading}
+            >
+              {loading ? "Отправка..." : "Отправить"}
             </button>
           </form>
           {message && (
